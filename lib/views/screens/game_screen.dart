@@ -215,25 +215,63 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 20,
             children: [
-              _buildPlayerInfo(
-                  "Player 1", removedPiecesPlayer2, Colors.blue, Colors.red),
-              Stack(
+              _buildPlayerInfo(removedPiecesPlayer2, Colors.red),
+              Column(
+                spacing: 15,
                 children: [
-                  CustomPaint(
-                    size: Size(340, 340),
-                    painter: GridPainter(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Icon(
+                        Icons.person_3_rounded,
+                        color: Colors.blue,
+                      ),
+                      Text(
+                        "Player 1",
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: _buildBoard(),
-                  )
+                  Stack(
+                    children: [
+                      CustomPaint(
+                        size: Size(340, 340),
+                        painter: GridPainter(),
+                      ),
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        child: _buildBoard(),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Icon(
+                        Icons.person_2_rounded,
+                        color: Colors.red,
+                      ),
+                      Text(
+                        "Player 2",
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              _buildPlayerInfo(
-                  "Player 2", removedPiecesPlayer1, Colors.red, Colors.blue),
+              _buildPlayerInfo(removedPiecesPlayer1, Colors.blue),
             ],
           ),
         ));
@@ -305,32 +343,21 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildPlayerInfo(
-      String player, int removedPieces, Color playerColor, Color pieceColor) {
-    return Column(
-      children: [
-        Text(
-          "$player: $removedPieces",
-          style: TextStyle(
-              color: playerColor, fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            removedPieces,
-            (index) => Container(
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              height: 20,
-              width: 20,
-              decoration: BoxDecoration(
-                color: pieceColor,
-                shape: BoxShape.circle,
-              ),
-            ),
+  Widget _buildPlayerInfo(int removedPieces, Color pieceColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        removedPieces,
+        (index) => Container(
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          height: 20,
+          width: 20,
+          decoration: BoxDecoration(
+            color: pieceColor,
+            shape: BoxShape.circle,
           ),
         ),
-      ],
+      ),
     );
   }
 
