@@ -292,7 +292,11 @@ class _GameScreenState extends State<GameScreen> {
                         : board[y][x] == 2
                             ? Icons.person_2_rounded
                             : null,
-                    color: Colors.white),
+                    color: board[y][x] == 1
+                        ? Colors.white
+                        : board[y][x] == 2
+                            ? Colors.black
+                            : null),
               ),
             ),
           ),
