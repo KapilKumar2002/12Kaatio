@@ -219,62 +219,86 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               _buildPlayerInfo(
                   "Player 1", removedPiecesPlayer2, Colors.blue, Colors.red),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  5,
-                  (y) => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      5,
-                      (x) => GestureDetector(
-                        onTap: () {
-                          if (board[y][x] == currentPlayer) {
-                            selectPiece(x, y);
-                          } else if (highlighted[y][x]) {
-                            movePiece(x, y);
-                          }
-                        },
-                        child: AnimatedContainer(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          width: 60,
-                          height: 60,
-                          margin: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10.0,
-                                color: highlighted[y][x]
-                                    ? Colors.pink
-                                    : board[y][x] == 1
-                                        ? Colors.blue
-                                        : board[y][x] == 2
-                                            ? Colors.red
-                                            : Colors.grey,
-                                offset: Offset(0, 0),
-                              ),
-                            ],
-                            color: highlighted[y][x]
-                                ? Colors.pink
-                                : board[y][x] == 1
-                                    ? Colors.blue
-                                    : board[y][x] == 2
-                                        ? Colors.red
-                                        : Colors.grey[800],
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    ),
+              Stack(
+                children: [
+                  CustomPaint(
+                    size: Size(340, 340),
+                    painter: GridPainter(),
                   ),
-                ),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    child: _buildBoard(),
+                  )
+                ],
               ),
               _buildPlayerInfo(
                   "Player 2", removedPiecesPlayer1, Colors.red, Colors.blue),
             ],
           ),
         ));
+  }
+
+  _buildBoard() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        5,
+        (y) => Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            5,
+            (x) => GestureDetector(
+              onTap: () {
+                if (board[y][x] == currentPlayer) {
+                  selectPiece(x, y);
+                } else if (highlighted[y][x]) {
+                  movePiece(x, y);
+                }
+              },
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                width: 60,
+                height: 60,
+                margin: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.cyan.shade200, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 10.0,
+                      color: highlighted[y][x]
+                          ? Colors.pink
+                          : board[y][x] == 1
+                              ? Colors.blue
+                              : board[y][x] == 2
+                                  ? Colors.red
+                                  : Colors.grey,
+                      offset: Offset(0, 0),
+                    ),
+                  ],
+                  color: highlighted[y][x]
+                      ? Colors.pink
+                      : board[y][x] == 1
+                          ? Colors.blue
+                          : board[y][x] == 2
+                              ? Colors.red
+                              : Colors.grey[800],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                    board[y][x] == 1
+                        ? Icons.person_3_rounded
+                        : board[y][x] == 2
+                            ? Icons.person_2_rounded
+                            : null,
+                    color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildPlayerInfo(
@@ -320,4 +344,59 @@ class _GameScreenState extends State<GameScreen> {
       ],
     );
   }
+}
+
+class GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint shadowPaint = Paint()
+      ..color = Colors.cyan.withOpacity(0.3)
+      ..strokeWidth = 6
+      ..style = PaintingStyle.stroke;
+
+    Paint gridPaint = Paint()
+      ..color = Colors.cyan
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke;
+
+    double cellSize = size.width / 5;
+    double startX = 0;
+    double startY = 0;
+
+    List<Offset> positions = [];
+    for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 5; j++) {
+        positions.add(Offset(startX + j * cellSize + cellSize / 2,
+            startY + i * cellSize + cellSize / 2));
+      }
+    }
+
+    for (int i = 0; i < positions.length; i++) {
+      for (int j = i + 1; j < positions.length; j++) {
+        double dx = (positions[j].dx - positions[i].dx).abs();
+        double dy = (positions[j].dy - positions[i].dy).abs();
+
+        if ((dx == cellSize && dy == 0) ||
+            (dy == cellSize && dx == 0) ||
+            (dx == cellSize && dy == cellSize)) {
+          canvas.drawLine(positions[i].translate(3, 3),
+              positions[j].translate(3, 3), shadowPaint);
+          canvas.drawLine(positions[i], positions[j], gridPaint);
+        }
+      }
+    }
+
+    Paint nodePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    for (Offset pos in positions) {
+      canvas.drawCircle(pos.translate(3, 3), 6, shadowPaint);
+      canvas.drawCircle(pos, 6, nodePaint);
+      canvas.drawCircle(pos, 10, gridPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
